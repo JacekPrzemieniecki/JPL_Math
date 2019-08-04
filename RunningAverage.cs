@@ -1,41 +1,31 @@
 ﻿using Unity.Collections;
-using Unity.Mathematics;
 using static Unity.Mathematics.math;
-using System.Collections.Generic;
-using UnityEngine;
+using static JPL.Math.JPLMath;
 
-public struct RunningAverage
+namespace JPL.Math
 {
-    NativeArray<float> _buffer;
-    int _count;
-    int _next;
-    public RunningAverage(int frames, Allocator allocator)
+    public struct RunningAverage
     {
-        _buffer = new NativeArray<float>(frames, allocator);
-        _count = 0;
-        _next = 0;
-    }
-
-    public void Add(float val)
-    {
-        _buffer[_next] = val;
-        _count = min(_count + 1, _buffer.Length);
-        _next = (_next + 1) % _buffer.Length;
-    }
-
-    public float Get()
-    {
-        if (_count == 0) return 0;
-        float sum = 0;
-        for (int i = 0; i < _count; i++)
+        NativeArray<float> _buffer;
+        int _count;
+        int _next;
+        
+        public RunningAverage(int frames, Allocator allocator)
         {
-            sum += _buffer[i];
+            _buffer = new NativeArray<float>(frames, allocator);
+            _count = 0;
+            _next = 0;
         }
-        return sum / _count;
-    }
 
-    public void Dispose()
-    {
-        _buffer.Dispose();
+        public void Add(float val)
+        {
+            _buffer[_next] = val;
+            _count = min(_count + 1, _buffer.Length);
+            _next = (_next + 1) % _buffer.Length;
+        }
+
+        public float Get() => average(_buffer.Slice(0, _count));
+
+        public void Dispose() => _buffer.Dispose();
     }
 }
