@@ -1,4 +1,5 @@
 ﻿using Unity.Mathematics;
+using UnityEngine;
 using static JPL.Math.JPLMath;
 using static Unity.Mathematics.math;
 
@@ -99,6 +100,16 @@ namespace JPL.Math
                        abs(dot(rectRight, localPoint)) < lengthsq(rectRight);
             }
             return false;
+        }
+
+        public static bool RayToBox3D(float3 rayOrigin, float3 rayDir, float3 boxCenter, float3 boxHalfExtents, quaternion boxRotation, out float distance)
+        {
+            var invRot = inverse(boxRotation);
+            var box2Ray = fromTo(boxCenter, rayOrigin);
+            var rayO = mul(invRot, box2Ray);
+            var rayD = mul(invRot, rayDir);
+            Bounds bounds = new Bounds(default, 2 * boxHalfExtents);
+            return bounds.IntersectRay(new Ray(rayO, rayD), out distance);
         }
     }
 }
