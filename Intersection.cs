@@ -111,5 +111,25 @@ namespace JPL.Math
             Bounds bounds = new Bounds(default, 2 * boxHalfExtents);
             return bounds.IntersectRay(new Ray(rayO, rayD), out distance);
         }
+
+        public static bool RayToSphere(float3 rayOrigin, float3 rayDir, float3 center, float radius, out float distance)
+        {
+            // http://www.iquilezles.org/www/articles/intersectors/intersectors.htm
+            float3 oc = rayOrigin - center;
+            float b = dot(oc, rayDir);
+            float c = dot(oc, oc) - radius*radius;
+            float h = b*b - c;
+            if(h < 0.0)
+            {
+                distance = 0;
+                return false;
+            }
+            else
+            {
+                h = sqrt(h);
+                distance = -b -h;
+                return true;
+            }
+        }
     }
 }
